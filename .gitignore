@@ -1,0 +1,27 @@
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Visual Studio Code
+.vscode/
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Logdateien
+*.log
+
+# Lokale Konfiguration
+application-local.properties
+.env
