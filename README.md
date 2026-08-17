@@ -18,7 +18,7 @@ Die Anwendung ermöglicht:
 - Spring Data JPA
 - Hibernate
 - MySQL
-- Maven
+
 
 ## Projektstatus
 
