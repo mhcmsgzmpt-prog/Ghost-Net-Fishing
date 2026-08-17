@@ -1,4 +1,4 @@
-# Ghost-Net-Fishing-
+# Ghost-Net-Fishing
 Webanwendung zur Meldung und Bergung von Geisternetzen
 ## Ziel des Projekts
 
