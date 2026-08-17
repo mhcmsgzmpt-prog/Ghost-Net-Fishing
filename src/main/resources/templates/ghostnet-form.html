@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neues Geisternetz melden</title>
+</head>
+<body>
+    <h1>Neues Geisternetz melden</h1>
+    <form th:object="${ghostNet}" th:action="@{/ghostnets}" method="post">
+        <div>
+            <label for="latitude">Breitengrad:</label>
+            <input type="number" id="latitude" th:field="*{latitude}" min="-90" max="90" step="any" required>
+            <small>Erlaubter Bereich: -90 bis 90</small>
+        </div>
+        <div>
+            <label for="longitude">Längengrad:</label>
+            <input type="number" id="longitude" th:field="*{longitude}" min="-180" max="180" step="any" required>
+            <small>Erlaubter Bereich: -180 bis 180</small>
+
+            <p th:if="${#fields.hasErrors('latitude')}" th:errors="*{latitude}">Breitengrad ist ungültig</p>
+        </div>
+        <div>
+            <label for="estimatedSize">Geschätzte Größe (m²):</label>
+            <input type="number" id="estimatedSize" th:field="*{estimatedSize}" step="any" min="0" required>
+            <p th:if="${#fields.hasErrors('estimatedSize')}" th:errors="*{estimatedSize}">Geschätzte Größe ist ungültig</p>
+        </div>
+        
+        <h2>Angaben zur meldenden Person</h2>
+        <div>
+            <input type="checkbox" id="anonymous" th:field="*{reportingPerson.anonymous}">
+            <label for="anonymous">Anonym melden</label>
+        </div>
+
+        <br>
+        <div>
+            <label for="reportingName">Name:</label>
+            <input type="text" id="reportingName" th:field="*{reportingPerson.name}">
+        </div>
+           
+        <br>
+
+        <div>
+            <label for="reportingPhoneNumber">Telefonnummer:</label>
+            <input type="text" id="reportingPhoneNumber" th:field="*{reportingPerson.phoneNumber}">
+        </div>
+
+        <button type="submit">Geisternetz melden</button>
+    </form>
+<p>
+    <a th:href="@{/ghostnets}">Zurück zur Übersicht</a>
+</p>
+
+<script>
+const anonymousCheckbox = document.getElementById('anonymous');
+const name = document.getElementById('reportingName');
+const phoneNumber = document.getElementById('reportingPhoneNumber');
+
+function updateReportingPersonFields() {
+    const isAnonymous = anonymousCheckbox.checked;
+    name.disabled = isAnonymous;
+    phoneNumber.disabled = isAnonymous;
+
+    if (isAnonymous) {
+        name.value = '';
+        phoneNumber.value = '';
+    }
+}
+    anonymousCheckbox.addEventListener('change', updateReportingPersonFields);
+updateReportingPersonFields();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Net Fishing</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        #ghostNetMap {
+            height: 450px;
+            width:  100%;
+            max-width: 1100px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Ghost Net Fishing</h1>
+
+<p th:if="${successMessage}"
+    th:text="${successMessage}">
+</p>
+
+<p th:if="${errorMessage}"
+    th:text="${errorMessage}">
+</p>
+
+<div th:if="${!isAdmin}">
+    <a th:href="@{/admin/login}">
+        Als Admin anmelden
+    </a>
+</div>
+
+<div th:if="${isAdmin}">
+    <p>
+        <strong>Als Administrator angemeldet</strong>
+    </p>
+
+    <form th:action="@{/admin/logout}"
+        method="post">
+
+        <button type="submit">
+            Abmelden
+        </button>
+        </form>
+</div>
+
+<hr>
+
+<a th:href="@{/ghostnets/new}">
+    Neues Geisternetz melden
+</a>
+
+<h2>Gemeldete Geisternetze auf der Karte</h2>
+
+<p th:if="${#lists.isEmpty(mapGhostNets)}">
+    Es wurden noch keine Geisternetze gemeldet.</p>
+
+<div id="ghostNetMap"
+    th:if="${!#lists.isEmpty(mapGhostNets)}"></div>
+
+    <div id="ghostNetData" style="display: none;">
+        <div th:each="ghostNet : ${mapGhostNets}"
+            class="ghost-net-marker"
+            th:attr="
+            data-id=${ghostNet.id}, 
+            data-latitude=${ghostNet.latitude}, 
+            data-longitude=${ghostNet.longitude}, 
+            data-estimated-size=${ghostNet.estimatedSize}, 
+            data-status=${ghostNet.status.displayName}, 
+            data-details-url=@{/ghostnets/{id}(id=${ghostNet.id})}">
+            </div>
+    </div>
+
+<h2>Gemeldete Geisternetze</h2>
+
+<p th:if="${#lists.isEmpty(ghostNets)}">
+    Es wurden noch keine Geisternetze gemeldet.</p> 
+
+<table th:if="${!#lists.isEmpty(ghostNets)}" border="1">
+<thead>
+    <tr>
+        <th>ID</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Estimated Size</th>
+        <th>Status</th>
+        <th>Details</th>
+        <th>Bergung</th>
+        <th>Bergende Person</th>
+        <th th:if="${isAdmin}">
+            Aktionen
+        </th>
+    </tr>
+</thead>
+
+<tbody>
+    <tr th:each="ghostNet : ${ghostNets}">
+        <td th:text="${ghostNet.id}"></td>
+        <td th:text="${ghostNet.latitude}"></td>
+        <td th:text="${ghostNet.longitude}"></td>
+        <td th:text="${ghostNet.estimatedSize + ' m²'}"></td>
+        <td th:text="${ghostNet.status.displayName}">       
+        </td>
+        <td>
+            <a th:href="@{/ghostnets/{id}(id=${ghostNet.id})}">
+                Details anzeigen
+            </a>
+        </td>
+
+        <td>
+        <a th:if="${ghostNet.recoveringPerson == null and ghostNet.status.name() == 'REPORTED'}"
+                th:href="@{/ghostnets/{id}/recover(id=${ghostNet.id})}">
+                    Bergung übernehmen
+                </a>
+
+        <a th:if="${ghostNet.recoveringPerson != null and ghostNet.status.name() != 'RECOVERED'}"
+                th:href="@{/ghostnets/{id}(id=${ghostNet.id})}">
+                Status bearbeiten
+        </a>
+            <span th:if="${ghostNet.status.name() == 'RECOVERED'}">
+                Bergung abgeschlossen
+            </span>
+
+            <span th:if="${ghostNet.recoveringPerson == null 
+                and ghostNet.status.name() != 'REPORTED'
+                and ghostNet.status.name() != 'RECOVERED'}">
+                Nicht verfügbar
+            </span>
+        </td>
+        <td> 
+            <span th:if="${ghostNet.recoveringPerson != null}"
+                th:text="${ghostNet.recoveringPerson.name}">
+            </span>
+            <span th:if="${ghostNet.recoveringPerson == null}">
+                -
+            </span>
+    
+        </td>
+
+        <td th:if="${isAdmin}">
+            <form th:action="@{/admin/ghostnets/{id}/delete(id=${ghostNet.id})}"
+            method="post"
+            onsubmit="return confirm('Möchten Sie dieses Geisternetz wirklich löschen?');">
+        
+        <button type="submit">
+            Löschen
+        </button>
+        </form>
+        </td>
+    </tr>
+</tbody>
+</table>
+<script>
+const markerElements = document.querySelectorAll('.ghost-net-marker');
+if(markerElements.length > 0) {
+    const map = L.map('ghostNetMap').setView([20, 0], 2);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap-Mitwirkende"
+    }).addTo(map);
+
+    const markers = [];
+
+    markerElements.forEach(element => {
+       
+        const latitude = Number(element.dataset.latitude);
+        const longitude = Number(element.dataset.longitude);
+    
+        const mapMarker = L.marker([latitude, longitude]).addTo(map);
+
+        mapMarker.bindPopup(`
+            <strong>Geisternetz ID:</strong> ${element.dataset.id}<br>
+            <strong>Geschätzte Größe:</strong> ${element.dataset.estimatedSize} m²<br>
+            <strong>Status:</strong> ${element.dataset.status}<br>
+            <a href="${element.dataset.detailsUrl}">Details anzeigen</a>
+        `);
+        markers.push(mapMarker);
+    });
+if (markers.length === 1) {
+    map.setView(markers[0].getLatLng(), 6);}
+    else {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+</script>
+
+</body>
+</html>

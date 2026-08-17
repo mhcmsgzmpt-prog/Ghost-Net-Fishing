@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bergung übernehmen</title>
+</head>
+<body>
+    <h1>Bergung übernehmen</h1>
+
+    <p>
+        Gesiternetz-ID:
+        <span th:text="${ghostNet.id}"></span>
+    </p>
+
+   <p>
+    Position:
+    <span th:text="${ghostNet.latitude}"></span>,
+    <span th:text="${ghostNet.longitude}"></span>
+   </p>
+
+   <form th:action="@{/ghostnets/{id}/recover(id=${ghostNet.id})}"
+        th:object="${recoveringPerson}" 
+        method="post">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" th:field="*{name}" required>
+        </div>
+        <br>
+        <div>
+            <label for="phoneNumber">Telefonnummer:</label>
+            <input type="text" id="phoneNumber" th:field="*{phoneNumber}" required>
+        </div>
+        <br>
+        <button type="submit">Bergung übernehmen</button>
+    </form>
+
+    <p> 
+        <a th:href="@{/ghostnets/{id}(id=${ghostNet.id})}">Abbrechen</a>
+    </p>
+</body>
+</html>

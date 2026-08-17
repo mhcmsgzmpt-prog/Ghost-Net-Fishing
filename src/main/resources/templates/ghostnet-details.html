@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geisternetz-Details</title>
+</head>
+<body>
+    <h1>Geisternetz-Details</h1>
+
+    <p th:if="${successMessage}" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
+    <div>
+    <p><strong>ID:</strong> <span th:text="${ghostNet.id}"></span></p>
+    <p><strong>Breitengrad:</strong> <span th:text="${ghostNet.latitude}"></span></p>
+    <p><strong>Längengrad:</strong> <span th:text="${ghostNet.longitude}"></span></p>
+    <p><strong>Geschätzte Größe (m²):</strong> <span th:text="${ghostNet.estimatedSize + ' m²'}"></span></p>
+    <p><strong>Aktueller Status:</strong> <span th:text="${ghostNet.status.displayName}"></span></p>
+    </div>
+    <hr>
+    <h2>Meldende Person</h2>
+
+    <div th:th:if="${ghostNet.reportingPerson != null}">
+    <p th:if="${ghostNet.reportingPerson.anonymous}">
+        <strong>Name:</strong>
+        <strong>Anonym</strong>
+    </p>
+    <div th:if="${!ghostNet.reportingPerson.anonymous}">
+        <p>
+            <strong>Name:</strong>
+            <span th:text="${ghostNet.reportingPerson.name}"></span>
+        </p>
+
+        <p>
+            <strong>Telefonnummer:</strong>
+            <span th:text="${ghostNet.reportingPerson.phoneNumber}"></span>
+        </p>
+    </div>
+    </div>
+
+    <p th:if="${ghostNet.reportingPerson == null}">
+        Keine meldende Person vorhanden.
+    </p>
+    <hr>
+
+<h2>Bergende Person</h2>
+
+<div th:if="${ghostNet.recoveringPerson != null}">
+<p>
+    <strong>Name</strong>
+    <span th:text="${ghostNet.recoveringPerson.name}"></span>
+</p>
+
+<p> <strong>Telefonnummer</strong>
+<span th:text="${ghostNet.recoveringPerson.phoneNumber}"></span></p>
+</div>
+<div th:if="${ghostNet.recoveringPerson == null}">
+<p>Noch keine bergende Person eingetragen</p>
+<p th:if="${ghostNet.recoveringPerson == null}">
+    <a th:href="@{/ghostnets/{id}/recover(id=${ghostNet.id})}">
+        Bergung übernehmen
+    </a>
+</p>
+</div>
+
+<hr>
+<div th:if="${canChangeStatus}">
+
+
+    <h2>Status ändern</h2>
+
+    <form th:action="@{/ghostnets/{id}/status(id=${ghostNet.id})}" method="post">
+    <div>
+    <label for="status">Neuer Status:</label>
+    <select id="status" name="status" required>
+    <option 
+        th:each="status : ${statuses}"
+        th:value="${status}"
+        th:text="${status.displayName}"
+        th:selected="${status == ghostNet.status}"></option>
+                    
+    </select>
+    </div>
+    <button type="submit">Status speichern</button>
+    </form>
+
+</div>
+
+<div th:if="${!canChangeStatus}">
+
+    <p th:if="${ghostNet.recoveringPerson == null}">
+        Der Status kann erst geändert werden, wenn eine bergende Person eingetragen wurde.
+    </p>
+
+    <p th:if="${ghostNet.recoveringPerson == 'RECOVERED'}">
+        Die Bergung dieses Geisternetzes wurde bereits abgeschlossen.
+        Der Status kann nicht mehr geändert werden.
+    </p>
+</div>
+
+<hr>
+    <h3>Verschollenmeldung</h3>
+
+    <div th:if="${ghostNet.missingReportingPerson != null}">
+    <p>
+        <strong>Gemeldet von:</strong>
+        <span th:text="${ghostNet.missingReportingPerson.name}"></span>
+    </p>
+    <p>
+        <strong>Telefonnummer</strong>
+        <span th:text="${ghostNet.missingReportingPerson.phoneNumber}"></span>
+    </p>
+    </div>
+
+<p th:if="${ghostNet.missingReportingPerson == null and ghostNet.status.name() != 'RECOVERED'}">
+
+    <a th:href="@{/ghostnets/{id}/missing(id=${ghostNet.id})}">Netz als verschollen melden</a>
+
+</p>
+
+<hr>
+
+
+    <p>
+    <a th:href="@{/ghostnets}">Zurück zur Übersicht</a>
+    </p>
+
+</body>
+</html>

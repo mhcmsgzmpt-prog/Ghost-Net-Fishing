@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator-Anmeldung</title>
+</head>
+
+<body>
+
+    <h1>Administrator-Anmeldung</h1>
+
+    <div style="border:1px solid black; padding:10px; width:350px;">
+        <strong>Testzugang</strong>
+        <p>Benutzername: <strong>ADMIN</strong></p>
+        <p>Passwort: <strong>12345</strong></p>
+    </div>
+
+    <br>
+
+<p th:if="${errorMessage}"
+    th:text="${errorMessage}">
+</p>
+
+<form th:action="@{/admin/login}" method="post">
+
+    <div>
+        <label for="username">Benutzername:</label><br>
+        <input type="text"
+        id="username"
+        name="username"
+        required>
+    </div>
+    <br>
+    <div>
+        <label for="password">Password:</label><br>
+        <input type="password"
+        id="password"
+        name="password"
+        required>
+    </div>
+    <br>
+
+    <button type="submit">
+        Anmelden
+    </button>
+</form>
+<br>
+<a th:href="@{/ghostnets}">
+    Zurück zur Übersicht
+</a>
+
+</body>
+</html>
