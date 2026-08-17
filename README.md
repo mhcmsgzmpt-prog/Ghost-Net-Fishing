@@ -1,6 +1,5 @@
 # Ghost-Net-Fishing
 Webanwendung zur Meldung und Bergung von Geisternetzen
-## Ziel des Projekts
 
 Die Anwendung ermöglicht:
 
@@ -9,16 +8,6 @@ Die Anwendung ermöglicht:
 - die Übernahme einer Bergung
 - das Markieren eines Netzes als geborgen
 - das Melden eines Netzes als verschollen
-
-## Verwendete Technologien
-
-- Java
-- Spring Boot
-- Thymeleaf
-- Spring Data JPA
-- Hibernate
-- MySQL
-
 
 ## Projektstatus
 
